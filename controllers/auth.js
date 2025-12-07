@@ -34,4 +34,29 @@ router.post('/sign-up', async (req, res) => {
   res.send(user);
 });
 
+router.get('/sign-in', async (req, res) => {
+  res.render('auth/sign-in.ejs');
+});
+
+router.post('/sign-in', async (req, res) => {
+  // try to find the user inthe db
+  const { username, password } = req.body;
+  // make sure the user does not exist
+  const userInDatabase = await User.findOne({ username });
+
+  // if the user does not exist, redirect to sign up with msg
+  if (!userInDatabase) {
+    res.send('Username or Password is invalid');
+  }
+  // i the user exists, lets compare the pw with the usr pw
+
+  const isValidPassword = bcrypt.compareSync(password, userInDatabase.password);
+  // if the pw doesnt match, throw an error
+  if (!isValidPassword) {
+    res.send('Username or Password is invalid');
+  }
+
+  // else continue with the "login"
+});
+
 module.exports = router;
