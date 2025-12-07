@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
 
 const router = express.Router();
 const User = require('../models/user');
@@ -20,11 +21,17 @@ router.post('/sign-up', async (req, res) => {
     res.send('Username or Password is invalid');
   }
   // take the password and encrypt in some way.
+  const hashPassword = bcrypt.hashSync(password, 10);
+
   // If the above passes, then let's create the account
   // with the encrypted password.
+  req.body.password = hashPassword;
+  delete req.body.confirmPassword;
+
+  const user = await User.create(req.body);
   // when that succeeds let's go ahead and "sign the person in"
   // rediret them to some page
-  res.send(req.body);
+  res.send(user);
 });
 
 module.exports = router;
