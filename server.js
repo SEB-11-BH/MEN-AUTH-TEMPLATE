@@ -12,6 +12,7 @@ const morgan = require('morgan');
 
 // Controllers
 const authCtrl = require('./controllers/auth');
+const isSignedIn = require('./middleware/isSignedIn');
 
 // Set the port from environment variable or default to 3000
 const port = process.env.PORT ? process.env.PORT : '3000';
@@ -46,6 +47,11 @@ app.get('/', async (req, res) => {
 app.use('/auth', authCtrl);
 
 // Protected Routes
+app.use(isSignedIn);
+
+app.get('/vip-lounge', async (req, res) => {
+  res.send('VIP PAGE');
+});
 
 app.listen(port, () => {
   console.log(`The express app is ready on port ${port}!`);

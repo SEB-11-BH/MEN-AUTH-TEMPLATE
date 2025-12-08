@@ -8,17 +8,22 @@ router.get('/sign-up', async (req, res, next) => {
   res.render('auth/sign-up.ejs');
 });
 
+router.get('/sign-out', async (req, res) => {
+  req.session.destroy();
+  res.redirect('/');
+});
+
 router.post('/sign-up', async (req, res) => {
   const { username, password, confirmPassword } = req.body;
   // make sure the user does not exist
   const userInDatabase = await User.findOne({ username });
 
   if (userInDatabase) {
-    res.send('Username or Password is invalid');
+    return res.send('Username or Password is invalid');
   }
   // validate the passwords match
   if (password !== confirmPassword) {
-    res.send('Username or Password is invalid');
+    return res.send('Username or Password is invalid');
   }
   // take the password and encrypt in some way.
   const hashPassword = bcrypt.hashSync(password, 10);
@@ -31,7 +36,12 @@ router.post('/sign-up', async (req, res) => {
   const user = await User.create(req.body);
   // when that succeeds let's go ahead and "sign the person in"
   // rediret them to some page
-  res.send(user);
+  req.session.user = {
+    username: user.username,
+    _id: user._id,
+  };
+
+  res.redirect('/');
 });
 
 router.get('/sign-in', async (req, res) => {
