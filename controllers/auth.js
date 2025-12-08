@@ -57,6 +57,12 @@ router.post('/sign-in', async (req, res) => {
   }
 
   // else continue with the "login"
+  req.session.user = {
+    username: userInDatabase.username,
+    _id: userInDatabase._id,
+  };
+
+  res.redirect('/');
 });
 
 module.exports = router;

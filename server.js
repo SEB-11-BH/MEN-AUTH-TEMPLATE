@@ -1,10 +1,11 @@
+/* eslint-disable prefer-destructuring */
 const dotenv = require('dotenv');
 
 dotenv.config();
 const express = require('express');
 
 const app = express();
-
+const session = require('express-session');
 const mongoose = require('mongoose');
 const methodOverride = require('method-override');
 const morgan = require('morgan');
@@ -27,11 +28,21 @@ app.use(express.urlencoded({ extended: false }));
 app.use(methodOverride('_method'));
 // Morgan for logging HTTP requests
 app.use(morgan('dev'));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 // Public
 app.get('/', async (req, res) => {
-  res.render('index.ejs');
+  const user = req.session.user;
+
+  res.render('index.ejs', { user });
 });
+
 app.use('/auth', authCtrl);
 
 // Protected Routes
