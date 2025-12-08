@@ -5,14 +5,21 @@ dotenv.config();
 const express = require('express');
 
 const app = express();
+// Sessions
 const session = require('express-session');
+const { MongoStore } = require('connect-mongo');
+
+// DB
 const mongoose = require('mongoose');
+
+// Middleware
 const methodOverride = require('method-override');
 const morgan = require('morgan');
+const passUserToView = require('./middleware/pass-user-to-view.js');
+const isSignedIn = require('./middleware/isSignedIn');
 
 // Controllers
 const authCtrl = require('./controllers/auth');
-const isSignedIn = require('./middleware/isSignedIn');
 
 // Set the port from environment variable or default to 3000
 const port = process.env.PORT ? process.env.PORT : '3000';
@@ -34,14 +41,16 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+    }),
   })
 );
+app.use(passUserToView);
 
 // Public
 app.get('/', async (req, res) => {
-  const user = req.session.user;
-
-  res.render('index.ejs', { user });
+  res.render('index.ejs');
 });
 
 app.use('/auth', authCtrl);

@@ -9,8 +9,9 @@ router.get('/sign-up', async (req, res, next) => {
 });
 
 router.get('/sign-out', async (req, res) => {
-  req.session.destroy();
-  res.redirect('/');
+  req.session.destroy(() => {
+    res.redirect('/');
+  });
 });
 
 router.post('/sign-up', async (req, res) => {
@@ -41,7 +42,9 @@ router.post('/sign-up', async (req, res) => {
     _id: user._id,
   };
 
-  res.redirect('/');
+  req.session.save(() => {
+    res.redirect('/');
+  });
 });
 
 router.get('/sign-in', async (req, res) => {
@@ -72,7 +75,9 @@ router.post('/sign-in', async (req, res) => {
     _id: userInDatabase._id,
   };
 
-  res.redirect('/');
+  req.session.save(() => {
+    res.redirect('/');
+  });
 });
 
 module.exports = router;
