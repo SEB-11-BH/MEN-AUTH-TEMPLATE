@@ -6,15 +6,7 @@
   <title>Document</title>
 </head>
 <body>
+  <%- include('./partials/_navbar.ejs') %>
   <p><a href="/vip-lounge">Get into the VIP Users Only lounge!</a></p>
-  <% if (user) { %>
-  <a href="/auth/sign-out">Sign out</a>
-  <h1>Welcome to the app, <%= user.username %>!</h1>
-  <% } else { %>
-  <h1>Welcome to the app, guest.</h1>
-  <p>
-    <a href="/auth/sign-up">Sign up</a> or <a href="/auth/sign-in">sign in</a>.
-  </p>
-  <% } %>
 </body>
 </html>
