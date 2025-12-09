@@ -1,5 +1,5 @@
 <h1>
-  <span class="headline">Openhouse</span>
+  <span class="headline">New Project</span>
   <span class="subhead">Setup</span>
 </h1>
 
