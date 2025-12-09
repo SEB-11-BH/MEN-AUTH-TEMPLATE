@@ -1,22 +1,19 @@
-/* eslint-disable prefer-destructuring */
-const dotenv = require('dotenv');
+require('dotenv').config();
+require('./config/database.js');
 
-dotenv.config();
 const express = require('express');
+const path = require('path');
 
 const app = express();
 // Sessions
 const session = require('express-session');
 const { MongoStore } = require('connect-mongo');
 
-// DB
-const mongoose = require('mongoose');
-
 // Middleware
 const methodOverride = require('method-override');
 const morgan = require('morgan');
 const passUserToView = require('./middleware/pass-user-to-view.js');
-const isSignedIn = require('./middleware/isSignedIn');
+const isSignedIn = require('./middleware/is-signed-in');
 
 // Controllers
 const authCtrl = require('./controllers/auth');
@@ -24,18 +21,14 @@ const authCtrl = require('./controllers/auth');
 // Set the port from environment variable or default to 3000
 const port = process.env.PORT ? process.env.PORT : '3000';
 
-mongoose.connect(process.env.MONGODB_URI);
-
-mongoose.connection.on('connected', () => {
-  console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
-});
-
+app.use(express.static(path.join(__dirname, 'public')));
 // Middleware to parse URL-encoded data from forms
 app.use(express.urlencoded({ extended: false }));
 // Middleware for using HTTP verbs such as PUT or DELETE
 app.use(methodOverride('_method'));
 // Morgan for logging HTTP requests
 app.use(morgan('dev'));
+// Session
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -46,16 +39,19 @@ app.use(
     }),
   })
 );
+
+// Locals
 app.use(passUserToView);
 
-// Public
+// ---------- PUBLIC ROUTES ----------
+
 app.get('/', async (req, res) => {
   res.render('index.ejs');
 });
 
 app.use('/auth', authCtrl);
 
-// Protected Routes
+// ---------- PROTECTED ROUTES ----------
 app.use(isSignedIn);
 
 app.get('/vip-lounge', async (req, res) => {
